@@ -31,10 +31,11 @@ refs.inputSearchBox.addEventListener('input', debounce(inputChangeHandler, DEBOU
 
 
 function inputChangeHandler(event) {
-    // console.log(event.target.value);
-    if ((event.target.value).trim() !== '') {
+    const inputData = (event.target.value).trim();  
+    // console.log(inputData);
+    if (inputData !== '') {
         
-        fetchCountries(event.target.value)
+        fetchCountries(inputData)
         .then(data => {
             console.log(data);
             if (data.length > 10) {
@@ -43,7 +44,7 @@ function inputChangeHandler(event) {
                 return renderCountries(data);
             } else if (data.length = 1) {
                 return renderCountryInfo(data);
-            }         
+            };         
          
         })
         .catch(error => {
