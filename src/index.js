@@ -1,8 +1,64 @@
 import './css/styles.css';
+import debounce from 'lodash.debounce';
+import Notiflix from 'notiflix';
 import { fetchCountries } from './js/fetchCountries.js';
-import countryCardTpl from './templates/country-card.hbs';
+import countryInfoCardTpl from './templates/country-info-card.hbs';
+import countriesListCardTpl from './templates/countries-list-card.hbs';
+
+
 
 const DEBOUNCE_DELAY = 300;
 
+const refs = {
+    countryInfoCardContainer: document.querySelector('.country-info'),
+    countryListCardContainer: document.querySelector('.country-list'),
+    inputSearchBox: document.querySelector('#search-box'),
+};
 
-fetchCountries('wi');
+
+const renderCountries = data => {
+    const markup = countriesListCardTpl(data);
+    refs.countryListCardContainer.innerHTML = markup;
+};
+
+const renderCountryInfo = data => {
+    const markup = countryInfoCardTpl(data);
+    refs.countryInfoCardContainer.innerHTML = markup;
+};
+
+
+refs.inputSearchBox.addEventListener('input', debounce(inputChangeHandler, DEBOUNCE_DELAY));
+
+
+function inputChangeHandler(event) {
+    // console.log(event.target.value);
+    if ((event.target.value).trim() !== '') {
+        
+        fetchCountries(event.target.value)
+        .then(data => {
+            console.log(data);
+            if (data.length > 10) {
+                return Notiflix.Notify.info('Too many matches found. Please enter a more specific name.');
+            } else if (data.length >= 2 && data.length <= 10) {
+                return renderCountries(data);
+            } else if (data.length = 1) {
+                return renderCountryInfo(data);
+            }         
+         
+        })
+        .catch(error => {
+            
+            console.log(error);
+            return Notiflix.Notify.failure("Oops, there is no country with that name");      
+
+        });
+       
+    };
+    
+    refs.countryListCardContainer.innerHTML = '';
+    refs.countryInfoCardContainer.innerHTML = '';
+
+};
+
+
+  
